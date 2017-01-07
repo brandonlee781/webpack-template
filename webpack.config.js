@@ -53,7 +53,7 @@ module.exports = function(env) {
       ]
     },
     parts.clean(PATHS.build),
-    parts.generateSourcemap('eval-source-map'),
+    parts.generateSourcemaps('eval-source-map'),
     parts.loadCSS(),
     parts.devServer({
       host: process.env.HOST,
