@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 exports.devServer = function(options) {
   return {
@@ -17,6 +18,24 @@ exports.devServer = function(options) {
         // multiStep: true
       })
     ]
+  };
+};
+
+exports.loadJavascript = function(paths) {
+  return {
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          include: paths,
+
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
+        }
+      ]
+    }
   };
 };
 
@@ -97,3 +116,39 @@ exports.lintCSS = function(paths) {
     }
   }
 }
+
+exports.generateSourcemaps = function(type) {
+  return {
+    devtool: type
+  };
+};
+
+exports.extractBundles = function(bundles, options) {
+  const entry = {};
+  const names = [];
+
+  bundles.forEach(({name, entries}) => {
+    if (entries) {
+      entry[name] = entries;
+    }
+
+    names.push(name);
+  });
+
+  return {
+    entry,
+    plugins: [
+      new webpack.optimize.CommonsChunkPlugin(
+        Object.assign({}, options, { names })
+      )
+    ]
+  }
+}
+
+exports.clean = function(path) {
+  return {
+    plugins: [
+      new CleanWebpackPlugin(path)
+    ]
+  };
+};
